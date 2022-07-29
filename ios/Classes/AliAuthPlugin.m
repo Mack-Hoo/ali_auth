@@ -42,6 +42,8 @@ bool bool_false = false;
 @property (nonatomic, strong) UIButton *btn_login_alert_horizontal;
 @property (nonatomic, strong) UITextView *tv_result;
 
+@property (nonatomic, assign) BOOL isChecked;
+
 @end
 
 @implementation AliAuthPlugin {
@@ -240,14 +242,16 @@ bool bool_false = false;
 - (void)btnClick: (UIGestureRecognizer *) sender {
   UIView *view = (UIView *)sender.view;
   NSInteger index = view.tag;
-  [[TXCommonHandler sharedInstance] cancelLoginVCAnimated: YES complete:^(void) {
     NSDictionary *dict = @{
       @"code": @"700005",
       @"msg" : @"点击第三方登录按钮",
-      @"data" : [NSNumber numberWithInteger: index]
+      @"data" : [NSNumber numberWithInteger: index],
+      @"isChecked" : @(self.isChecked),
     };
     self->_eventSink(dict);
-  }];
+//  [[TXCommonHandler sharedInstance] cancelLoginVCAnimated: YES complete:^(void) {
+//
+//  }];
 }
 
 // 一键登录预取号
@@ -310,19 +314,58 @@ bool bool_false = false;
                 NSString *code = [resultDic objectForKey:@"resultCode"];
                 if ([PNSCodeSuccess isEqualToString:code]) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
+//                        [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
                     });
                 } else if ([PNSCodeLoginControllerClickCancel isEqualToString:code]) {
                   [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
                 } else if ([PNSCodeCarrierChanged isEqualToString:code]) { // 切换运营商
 //                  [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
                 } else if ([PNSCodeLoginControllerClickChangeBtn isEqual: code]){
-                  [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
+//                  [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
+                }else if([PNSCodeLoginControllerPresentSuccess isEqual:code]){
+                    NSLog(@"唤起授权页成功");
+                    UIViewController *vc = [weakSelf findCurrentViewController];
+                    UIView *view = vc.view;
+                    while (view.subviews.count == 1) {
+                        view = view.subviews[0];
+                    }
+                    if (model.backgroundImage) {
+                        for (int i = 0; i < view.subviews.count; i++) {
+                            id subView = view.subviews[i];
+                            if ([subView isKindOfClass:[UIImageView class]]) {
+                                CGRect imageFrame = [(UIView *)subView frame];
+                                CGSize screenSize = [UIScreen mainScreen].bounds.size;
+                                if (imageFrame.origin.x == 0 && imageFrame.origin.y == 0 && imageFrame.size.width == screenSize.width && imageFrame.size.height == screenSize.height) {
+                                    UIView *imageView = (UIView *)subView;
+                                    UIView *markView = [[UIView alloc] init];
+                                    markView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.2];
+                                    markView.frame = imageView.bounds;
+                                    [imageView addSubview:markView];
+                                }
+                            }
+                        }
+                    }
+                    UIButton *otherBtn = nil;
+                    [weakSelf findOtherLoginButton:view.subviews result:otherBtn];
                 }
               [weakSelf showResult:resultDic];
             }];
         }];
     }];
+}
+
+- (void)findOtherLoginButton:(NSArray *)subviews result:(UIButton *)result{
+    for (int i =0; i < subviews.count; i++) {
+        id view = subviews[i];
+//        if ([view isKindOfClass:[UIButton class]] && [[(UIButton *)view titleLabel].text isEqualToString:@"本机号码一键登录/注册"]) {
+//            UIView *sub = (UIView *)view;
+//            sub.layer.borderColor = [UIColor colorWithRed:160/255.0 green:160/255.0 blue:160/255.0 alpha:1].CGColor;
+//            sub.layer.borderWidth = 1;
+//            return;
+//        }else{
+            [self findOtherLoginButton:[(UIView *)view subviews] result:result];
+//        }
+    }
 }
 
 #pragma mark - UI
@@ -344,12 +387,17 @@ bool bool_false = false;
 
 #pragma mark -  格式化数据utils返回数据
 - (void)showResult:(id __nullable)showResult  {
+    
   NSDictionary *dict = @{
       @"code": [NSString stringWithFormat: @"%@", [showResult objectForKey:@"resultCode"]],
       @"msg" : [showResult objectForKey:@"msg"]?:@"",
-      @"data" : [showResult objectForKey:@"token"]?:@""
+      @"data" : [showResult objectForKey:@"token"]?:@"",
+      @"isChecked" : [showResult objectForKey:@"isChecked"]?:@NO
   };
-  self->_eventSink(dict);
+    self.isChecked = [dict[@"isChecked"] boolValue];
+    if (self->_eventSink) {
+        self->_eventSink(dict);
+    }
   [self showResultLog: showResult];
 }
 
