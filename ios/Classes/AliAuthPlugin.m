@@ -304,7 +304,7 @@ bool bool_false = false;
         
         //2. 调用取号接口，加速授权页的弹起
         [[TXCommonHandler sharedInstance] accelerateLoginPageWithTimeout:timeout complete:^(NSDictionary * _Nonnull resultDic) {
-            if ([PNSCodeSuccess isEqualToString:[resultDic objectForKey:@"resultCode"]] == NO) {
+            if ([PNSCodeSuccess isEqualToString:[resultDic objectForKey:@"resultCode"]] == NO && [PNSCodeCallPreLoginInAuthPage isEqualToString:[resultDic objectForKey:@"resultCode"]] == NO) {
                 [weakSelf showResult:resultDic];
                 return ;
             }
