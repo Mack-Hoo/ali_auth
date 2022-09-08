@@ -483,6 +483,7 @@
   model.privacyOne = [[viewConfig stringValueForKey: @"appPrivacyOne" defaultValue: nil] componentsSeparatedByString:@","];
   model.privacyTwo = [[viewConfig stringValueForKey: @"appPrivacyTwo" defaultValue: nil] componentsSeparatedByString:@","];
   NSArray *privacyColors = [[viewConfig stringValueForKey: @"appPrivacyColor" defaultValue: nil] componentsSeparatedByString:@","];
+    model.privacyConectTexts = @[@"、", @"和"];
   if(privacyColors != nil && privacyColors.count > 1){
     model.privacyColors = @[
       [self colorWithHexString: privacyColors[0] alpha: 1],

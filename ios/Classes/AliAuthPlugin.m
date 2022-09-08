@@ -392,7 +392,8 @@ bool bool_false = false;
       @"code": [NSString stringWithFormat: @"%@", [showResult objectForKey:@"resultCode"]],
       @"msg" : [showResult objectForKey:@"msg"]?:@"",
       @"data" : [showResult objectForKey:@"token"]?:@"",
-      @"isChecked" : [showResult objectForKey:@"isChecked"]?:@NO
+      @"isChecked" : [showResult objectForKey:@"isChecked"]?:@NO,
+      @"privacyUrl" : [showResult objectForKey:@"url"]?:@""
   };
     self.isChecked = [dict[@"isChecked"] boolValue];
     if (self->_eventSink) {
