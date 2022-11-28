@@ -316,15 +316,16 @@
   model.hideNavBackItem = isHiddenNavBack;
   /// 动态读取assets文件夹下的资源
   UIImage * navBackImage = [self changeUriPathToImage: viewConfig[@"navReturnImgPath"]];
-//  if(navBackImage != nil){
-//    model.navBackImage = navBackImage;
-//  }
+  if(navBackImage != nil){
+    model.navBackImage = navBackImage;
+  }
     
-    UIButton *rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [rightBtn setImage:navBackImage forState:UIControlStateNormal];
-    [rightBtn setImage:navBackImage forState:UIControlStateHighlighted];
-    [rightBtn addTarget:self action:@selector(dismissAction) forControlEvents:UIControlEventTouchUpInside];
-    model.navMoreView = rightBtn;
+    /// 隐藏右边关闭按钮
+//    UIButton *rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [rightBtn setImage:navBackImage forState:UIControlStateNormal];
+//    [rightBtn setImage:navBackImage forState:UIControlStateHighlighted];
+//    [rightBtn addTarget:self action:@selector(dismissAction) forControlEvents:UIControlEventTouchUpInside];
+//    model.navMoreView = rightBtn;
     
   if (isCustomNavBack) {
     /// 自定义返回按钮
@@ -513,6 +514,8 @@
     }
   }
   model.checkBoxWH = [viewConfig floatValueForKey: @"checkBoxWH" defaultValue: 17.0];
+    model.checkBoxImageEdgeInsets = UIEdgeInsetsMake(4, 20, 26, 10);
+    model.privacyAlignment = NSTextAlignmentLeft;
   model.privacyFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
     float zoom = screenSize.height/812;
       NSLog(@"导航栏高度：%f",navBarHeight);
